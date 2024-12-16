@@ -37,7 +37,7 @@ export default function RegisterFormPage() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8080/api/auth/register', {
+            const response = await fetch('api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -48,19 +48,12 @@ export default function RegisterFormPage() {
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('Ошибка регистрации. Проверьте данные и попробуйте снова.');
+            if (response.status === 401) {
+                throw new Error('Данный логин уже занят');
+            }else if(!response.ok){
+                throw new Error('Ошибка регистрации. Сервер выдал неизвестную ошибку.');
             }
-
-            const data = await response.json();
-            console.log('Server response:', data);
-
-            // Сохраняем токен (если сервер его отправляет)
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-            }
-
-            navigate('/main');
+            navigate('/points');
         } catch (err) {
             setError(err.message || "Ошибка регистрации. Попробуйте снова.");
         } finally {

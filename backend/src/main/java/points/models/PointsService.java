@@ -3,6 +3,11 @@ package points.models;
 import com.google.gson.Gson;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import points.dao.PointDao;
 import points.entity.PointEntity;
 import points.entity.PointRequestDTO;
@@ -14,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class PointsService {
     @EJB
     CheckService checkService;

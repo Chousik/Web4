@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.Response;
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.LoginException;
 
-@Path("/auth")
+@Path("/api/auth")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthController {
@@ -33,8 +33,7 @@ public class AuthController {
                     true
             );
             return Response
-                    .status(Response.Status.SEE_OTHER)
-                    .location(java.net.URI.create("/points"))
+                    .status(Response.Status.CREATED)
                     .cookie(cookie)
                     .build();
         } catch (AuthenticationException e) {
@@ -60,8 +59,7 @@ public class AuthController {
                     true
             );
             return Response
-                    .status(Response.Status.SEE_OTHER)
-                    .location(java.net.URI.create("/points"))
+                    .status(Response.Status.CREATED)
                     .cookie(cookie)
                     .build();
         } catch (LoginException e) {

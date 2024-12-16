@@ -10,8 +10,10 @@ import jakarta.ws.rs.core.Response;
 import points.entity.PointRequestDTO;
 import points.models.PointsService;
 
-@Path("/points")
+@Path("/api/points")
 public class PointsController {
+    @Context
+    private HttpHeaders httpHeaders;
     @EJB
     PointsService pointsService;
     @GET
@@ -29,12 +31,11 @@ public class PointsController {
     }
     @Path("/check")
     @POST
-    public Response check(PointRequestDTO pointRequestDTO,
-                          @Context ContainerRequestContext requestContext) {
+    public Response check(@Context ContainerRequestContext requestContext,PointRequestDTO pointRequestDTO) {
         String username = (String) requestContext.getProperty("username");
         try {
             String result = pointsService.checkPoint(username, pointRequestDTO);
-            return Response.status(Response.Status.CREATED).build();
+            return Response.status(Response.Status.CREATED).entity(result).build();
         } catch (IllegalArgumentException e) {
             return Response
                     .status(Response.Status.BAD_REQUEST)

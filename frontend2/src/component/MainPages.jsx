@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import Graph from './Graph';
+import InputSection from './InputSectionXYR';
+import ResultsTable from './ResultsTable';
+import Pagination from './Pagination';
 import '../css/MainPage.css';
 
 export default function MainPage() {
@@ -8,10 +12,14 @@ export default function MainPage() {
     const [error, setError] = useState('');
     const [results, setResults] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(false);
     const resultsPerPage = 5;
 
     useEffect(() => {
-        drawGraph();
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        Graph.draw(ctx, rValue);
     }, [rValue]);
 
     const validateInputs = () => {
@@ -28,35 +36,38 @@ export default function MainPage() {
         return true;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!validateInputs()) return;
 
-        const newResult = {
+        const requestData = {
             x: xValue,
-            y: yValue,
+            y: parseFloat(yValue),
             r: rValue,
-            result: Math.random() > 0.5 ? 'Попадание' : 'Промах',
         };
-        setResults([newResult, ...results]);
-    };
 
-    const drawGraph = () => {
-        const canvas = document.getElementById('graphCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setLoading(true);
+        setError('');
 
-        ctx.beginPath();
-        ctx.moveTo(150, 0);
-        ctx.lineTo(150, 300);
-        ctx.moveTo(0, 150);
-        ctx.lineTo(300, 150);
-        ctx.strokeStyle = '#000';
-        ctx.stroke();
+        try {
+                const response = await fetch('http://localhost:8080/api/points/check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
 
-        ctx.beginPath();
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        ctx.arc(150, 150, rValue * 20, Math.PI, 1.5 * Math.PI);
-        ctx.fill();
+            if (!response.ok) {
+                throw new Error('Ошибка при проверке точки. Проверьте данные и попробуйте снова.');
+            }
+
+            const result = await response.json();
+            setResults([result, ...results]);
+        } catch (err) {
+            setError(err.message || 'Произошла ошибка. Попробуйте снова.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -71,88 +82,31 @@ export default function MainPage() {
             <div className="main-page">
                 <h1>Graph and Results</h1>
 
-                <div className="input-section">
-                    <div className="input-box">
-                        <h3>X</h3>
-                        {[...Array(5)].map((_, i) => (
-                            <label key={i}>
-                                <input
-                                    type="checkbox"
-                                    checked={xValue == i + 1}
-                                    onChange={() => setXValue(i + 1)}
-                                />{' '}
-                                {i + 1}
-                            </label>
-                        ))}
-                    </div>
-                    <div className="input-box">
-                        <h3>Input Y</h3>
-                        <input
-                            type="number"
-                            placeholder="Enter Y (-5 to 5)"
-                            value={yValue}
-                            onChange={(e) => setYValue(e.target.value)}
-                        />
-                    </div>
-                    <div className="input-box">
-                        <h3>R</h3>
-                        {[...Array(5)].map((_, i) => (
-                            <label key={i}>
-                                <input
-                                    type="checkbox"
-                                    checked={rValue === i + 1}
-                                    onChange={() => setRValue(i + 1)}
-                                />{' '}
-                                {i + 1}
-                            </label>
-                        ))}
-                    </div>
-                </div>
+                <InputSection
+                    xValue={xValue}
+                    setXValue={setXValue}
+                    yValue={yValue}
+                    setYValue={setYValue}
+                    rValue={rValue}
+                    setRValue={setRValue}
+                    error={error}
+                />
 
-                <div className="graph-section">
-                    <canvas id="graphCanvas" width="300" height="300"></canvas>
-                </div>
+                <Graph canvasId="graphCanvas" />
 
-                <button className="check-btn" onClick={handleSubmit}>
-                    Check
+                <button className="check-btn" onClick={handleSubmit} disabled={loading}>
+                    {loading ? 'Checking...' : 'Check'}
                 </button>
 
                 {error && <div className="error-message">{error}</div>}
 
-                <table className="results-table">
-                    <thead>
-                    <tr>
-                        <th>X</th>
-                        <th>Y</th>
-                        <th>R</th>
-                        <th>Result</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {currentResults.map((res, index) => (
-                        <tr key={index}>
-                            <td>{res.x}</td>
-                            <td>{res.y}</td>
-                            <td>{res.r}</td>
-                            <td>{res.result}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-                <div className="pagination">
-                    {Array.from(
-                        { length: Math.ceil(results.length / resultsPerPage) },
-                        (_, i) => (
-                            <button
-                                key={i + 1}
-                                onClick={() => paginate(i + 1)}
-                                className={currentPage === i + 1 ? 'active' : ''}
-                            >
-                                {i + 1}
-                            </button>
-                        )
-                    )}
-                </div>
+                <ResultsTable results={currentResults} />
+                <Pagination
+                    totalResults={results.length}
+                    resultsPerPage={resultsPerPage}
+                    currentPage={currentPage}
+                    paginate={paginate}
+                />
             </div>
         </div>
     );
