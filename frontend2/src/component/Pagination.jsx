@@ -15,7 +15,7 @@ export default function Pagination({
         <div className="pagination">
             {pageNumbers.map((pageNumber) => (
                 <button
-                    key={pageNumber}
+                    key={pageNumber}https://tailwindui.com/
                     onClick={() => paginate(pageNumber)}
                     className={currentPage === pageNumber ? 'active' : ''}
                 >

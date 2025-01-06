@@ -19,6 +19,7 @@ public class JaxRsConfig extends Application {
     public JaxRsConfig() {
         classes.add(AuthController.class);
         classes.add(PointsController.class);
+        classes.add(filters.CORSFilter.class);
         JwtTokenService jwtTokenService = new JwtTokenService();
         singletons.add(jwtTokenService);
         singletons.add(new JwtAuthFilter(jwtTokenService));

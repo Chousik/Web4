@@ -1,11 +1,14 @@
 package points.controllers;
 
+import auth.models.JwtTokenService;
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import points.entity.PointRequestDTO;
 import points.models.PointsService;
@@ -16,11 +19,13 @@ public class PointsController {
     private HttpHeaders httpHeaders;
     @EJB
     PointsService pointsService;
+    @EJB
+    JwtTokenService jwtTokenService;
     @GET
-    public Response points(@Context ContainerRequestContext requestContext) {
-        String username = (String) requestContext.getProperty("username");
+    public Response points() {
+        Cookie username = httpHeaders.getCookies().get("auth_token");
         try {
-            String results = pointsService.getHistory(username);
+            String results = pointsService.getHistory(jwtTokenService.getUsernameFromToken(username.getValue()));
             return Response.ok().entity(results).build();
         }catch (Exception e){
             return Response
@@ -31,10 +36,10 @@ public class PointsController {
     }
     @Path("/check")
     @POST
-    public Response check(@Context ContainerRequestContext requestContext,PointRequestDTO pointRequestDTO) {
-        String username = (String) requestContext.getProperty("username");
+    public Response check(PointRequestDTO pointRequestDTO) {
+        Cookie username = httpHeaders.getCookies().get("auth_token");
         try {
-            String result = pointsService.checkPoint(username, pointRequestDTO);
+            String result = pointsService.checkPoint(jwtTokenService.getUsernameFromToken(username.getValue()), pointRequestDTO);
             return Response.status(Response.Status.CREATED).entity(result).build();
         } catch (IllegalArgumentException e) {
             return Response

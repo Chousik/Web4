@@ -16,6 +16,33 @@ export default function MainPage() {
     const resultsPerPage = 5;
 
     useEffect(() => {
+        const fetchResults = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch('http://localhost:8080/api/points', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data. Please log in.');
+                }
+
+                const data = await response.json();
+                setResults(data);
+            } catch (err) {
+                setError(err.message || 'An error occurred while fetching data.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchResults();
+    }, []);
+
+    useEffect(() => {
         const canvas = document.getElementById('graphCanvas');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -49,7 +76,7 @@ export default function MainPage() {
         setError('');
 
         try {
-                const response = await fetch('http://localhost:8080/api/points/check', {
+            const response = await fetch('http://localhost:8080/api/points/check', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,8 +88,8 @@ export default function MainPage() {
                 throw new Error('Ошибка при проверке точки. Проверьте данные и попробуйте снова.');
             }
 
-            const result = await response.json();
-            setResults([result, ...results]);
+            const newResult = await response.json();
+            setResults([newResult, ...results]);
         } catch (err) {
             setError(err.message || 'Произошла ошибка. Попробуйте снова.');
         } finally {
@@ -88,7 +115,7 @@ export default function MainPage() {
                     yValue={yValue}
                     setYValue={setYValue}
                     rValue={rValue}
-                    setRValue={setRValue}
+                       setRValue={setRValue}
                     error={error}
                 />
 

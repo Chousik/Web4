@@ -25,7 +25,7 @@ public class JwtTokenService implements Serializable {
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (Exception e)  {
             return false;
         }
     }

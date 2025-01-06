@@ -5,8 +5,6 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import points.dao.PointDao;
 import points.entity.PointEntity;
@@ -15,7 +13,6 @@ import points.entity.PointResponseDTO;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
@@ -35,9 +32,9 @@ public class PointsService {
     }
     public String checkPoint(String username, PointRequestDTO pointRequestDTO) throws IllegalArgumentException{
         long startTime = System.nanoTime();
-        if (!checkService.check(pointRequestDTO)){
-            throw new IllegalArgumentException("Запрос содержит неверные аргументы");
-        }
+//        if (!checkService.check(pointRequestDTO)){
+//            throw new IllegalArgumentException("Запрос содержит неверные аргументы");
+//        }
         PointResponseDTO pointResponseDTO = new PointResponseDTO(pointRequestDTO);
         pointResponseDTO.setHit(checkService.check(pointRequestDTO));
         String dateNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

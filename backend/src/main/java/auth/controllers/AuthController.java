@@ -17,6 +17,7 @@ import javax.security.auth.login.LoginException;
 public class AuthController {
     @EJB
     AuthService authService;
+
     @Path("/login")
     @POST
     public Response login(UserDTO user) {
@@ -32,17 +33,22 @@ public class AuthController {
                     false,
                     true
             );
+            // Добавляем JSON-ответ
+            String jsonResponse = "{\"success\": true}";
             return Response
                     .status(Response.Status.CREATED)
                     .cookie(cookie)
+                    .entity(jsonResponse)
                     .build();
         } catch (AuthenticationException e) {
+            String errorResponse = "{\"error\":\"" + e.getMessage() + "\"}";
             return Response
                     .status(Response.Status.UNAUTHORIZED)
-                    .entity("{\"error\":\"" + e.getMessage() + "\"}")
+                    .entity(errorResponse)
                     .build();
         }
     }
+
     @Path("/register")
     @POST
     public Response register(UserDTO user) {
@@ -58,16 +64,19 @@ public class AuthController {
                     false,
                     true
             );
+            // Добавляем JSON-ответ
+            String jsonResponse = "{\"success\": true}";
             return Response
                     .status(Response.Status.CREATED)
                     .cookie(cookie)
+                    .entity(jsonResponse)
                     .build();
         } catch (LoginException e) {
+            String errorResponse = "{\"error\":\"" + e.getMessage() + "\"}";
             return Response
                     .status(Response.Status.UNAUTHORIZED)
-                    .entity("{\"error\":\"" + e.getMessage() + "\"}")
+                    .entity(errorResponse)
                     .build();
         }
-
     }
 }
