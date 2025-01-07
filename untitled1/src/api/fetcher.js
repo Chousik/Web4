@@ -12,12 +12,10 @@ export const fetcher = async (url, options = {}) => {
         },
     });
     if (!res.ok) {
-        // Если ошибка — читаем текст / json и бросаем исключение
         const errorBody = await res.text();
         const error = new Error(errorBody);
         error.status = res.status;
         throw error;
     }
-    // Предполагаем, что ответ — JSON
     return res.json();
 };

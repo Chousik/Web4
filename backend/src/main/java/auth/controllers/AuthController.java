@@ -2,11 +2,11 @@ package auth.controllers;
 
 import auth.entity.UserDTO;
 import auth.models.AuthService;
+import auth.models.JwtTokenService;
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.NewCookie;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
+import points.models.PointsService;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.LoginException;
@@ -17,6 +17,10 @@ import javax.security.auth.login.LoginException;
 public class AuthController {
     @EJB
     AuthService authService;
+    @Context
+    private HttpHeaders httpHeaders;
+    @EJB
+    JwtTokenService jwtTokenService;
 
     @Path("/login")
     @POST
@@ -78,5 +82,19 @@ public class AuthController {
                     .entity(errorResponse)
                     .build();
         }
+    }
+    @GET
+    @Path("/status")
+    public Response points() {
+        Cookie authToken = httpHeaders.getCookies().get("auth_token");
+        boolean isAuth = false;
+        if (authToken!=null){
+            isAuth = jwtTokenService.validateToken(authToken.getValue());
+        }
+        String response = "{\"isAuthenticated\":\"" + isAuth + "\"}";
+        return Response
+                .ok()
+                .entity(response)
+                .build();
     }
 }
