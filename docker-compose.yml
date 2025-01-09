@@ -16,7 +16,26 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-
+  tomee:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - elasticsearch
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - elk
+  npm:
+    build:
+      context: ./untitled1
+      dockerfile: Dockerfile
+    depends_on:
+      - tomee
+    ports:
+      - "3000:3000"
+    networks:
+      - elk
 networks:
   elk:
-    driver: bridge

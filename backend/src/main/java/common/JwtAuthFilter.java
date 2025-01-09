@@ -7,7 +7,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class JwtAuthFilter implements ContainerRequestFilter {
+public class    JwtAuthFilter implements ContainerRequestFilter {
     JwtTokenService jwtTokenService;
     public JwtAuthFilter(JwtTokenService jwtTokenService){
         this.jwtTokenService = jwtTokenService;
