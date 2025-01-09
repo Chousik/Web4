@@ -1,10 +1,6 @@
-/**
- * Универсальный fetcher для SWR.
- * Обратите внимание на 'credentials: "include"' для использования cookie.
- */
 export const fetcher = async (url, options = {}) => {
     const res = await fetch(url, {
-        credentials: 'include', // <== важно!
+        credentials: 'include',
         ...options,
         headers: {
             'Content-Type': 'application/json',

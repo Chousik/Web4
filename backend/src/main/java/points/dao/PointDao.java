@@ -1,28 +1,66 @@
 package points.dao;
 
-import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import co.elastic.clients.elasticsearch._types.Refresh;
+import config.ElasticsearchClientProvider;
 import points.entity.PointEntity;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Stateless
 public class PointDao {
-    @PersistenceContext(name = "PostgresPU")
-    private EntityManager entityManager;
-    @Transactional
+
+    @Inject
+    private ElasticsearchClientProvider clientProvider;
+
+    private static final String INDEX = "points";
+
     public void addPoint(PointEntity point) {
-        entityManager.persist(point);
+        try {
+            ElasticsearchClient client = clientProvider.getClient();
+
+            client.index(i -> i
+                    .index(INDEX)
+                    .id(null)
+                    .document(point)
+                    .refresh(Refresh.True)
+            );
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Transactional
     public List<PointEntity> getPoints(String username) {
-        return new ArrayList<>(entityManager.createQuery(
-                        "SELECT p FROM PointEntity p WHERE p.username = :user", PointEntity.class)
-                .setParameter("user", username)
-                .getResultList());
+        try {
+            ElasticsearchClient client = clientProvider.getClient();
+
+            SearchResponse<PointEntity> response = client.search(s -> s
+                            .index(INDEX)
+                            .query(q -> q.term(t -> t
+                                            .field("username")
+                                            .value(v -> v.stringValue(username))
+                                    )
+                            )
+                            .size(1000),
+                    PointEntity.class
+            );
+
+            return response.hits().hits()
+                    .stream()
+                    .map(Hit::source)
+                    .collect(Collectors.toList());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return List.of();
+        }
     }
 }

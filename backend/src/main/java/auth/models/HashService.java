@@ -3,9 +3,6 @@ package auth.models;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import jakarta.ejb.Stateless;
-import lombok.Setter;
-
-import java.io.Serializable;
 
 @Stateless
 public class HashService {

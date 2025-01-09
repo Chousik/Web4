@@ -6,7 +6,6 @@ import auth.models.JwtTokenService;
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
-import points.models.PointsService;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.LoginException;
@@ -37,7 +36,6 @@ public class AuthController {
                     false,
                     true
             );
-            // Добавляем JSON-ответ
             String jsonResponse = "{\"success\": true}";
             return Response
                     .status(Response.Status.CREATED)
@@ -68,7 +66,6 @@ public class AuthController {
                     false,
                     true
             );
-            // Добавляем JSON-ответ
             String jsonResponse = "{\"success\": true}";
             return Response
                     .status(Response.Status.CREATED)
@@ -85,16 +82,58 @@ public class AuthController {
     }
     @GET
     @Path("/status")
-    public Response points() {
+    public Response status() {
         Cookie authToken = httpHeaders.getCookies().get("auth_token");
         boolean isAuth = false;
         if (authToken!=null){
             isAuth = jwtTokenService.validateToken(authToken.getValue());
         }
-        String response = "{\"isAuthenticated\":\"" + isAuth + "\"}";
-        return Response
-                .ok()
-                .entity(response)
-                .build();
+        if (isAuth){
+            String response = "{\"isAuthenticated\":\"true\"}";
+            return Response
+                    .ok()
+                    .entity(response)
+                    .build();
+        }else {
+            String errorResponse = "{\\\"isAuthenticated\\\":\\\"\"false\"\\\" , \"error\":\"Не авторизован\"}";
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity(errorResponse)
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/logout")
+    public Response logout() {
+        Cookie authToken = httpHeaders.getCookies().get("auth_token");
+        boolean isAuth = false;
+        if (authToken!=null){
+            isAuth = jwtTokenService.validateToken(authToken.getValue());
+        }
+        if (isAuth) {
+            String jsonResponse = "{\"success\": true}";
+            NewCookie cookie = new NewCookie(
+                    "auth_token",
+                    "",
+                    "/",
+                    null,
+                    "JWT Token",
+                    0,
+                    false,
+                    true
+            );
+            return Response
+                    .status(Response.Status.CREATED)
+                    .cookie(cookie)
+                    .entity(jsonResponse)
+                    .build();
+        }else {
+            String errorResponse = "{\\\"isAuthenticated\\\":\\\"\"false\"\\\" , \"error\":\"NoAuth\"}";
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity(errorResponse)
+                    .build();
+        }
     }
 }

@@ -1,7 +1,6 @@
 package points.models;
 
 import jakarta.ejb.Stateless;
-import points.entity.PointEntity;
 import points.entity.PointRequestDTO;
 
 import java.io.Serializable;

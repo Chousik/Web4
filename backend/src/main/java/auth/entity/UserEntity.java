@@ -1,6 +1,6 @@
 package auth.entity;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +13,18 @@ import java.io.Serializable;
 @RequiredArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "users")
 public class UserEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = -517087502067735653L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable=false, unique=true)
     private Long id;
 
-    @Column(name = "user_name", nullable = false, unique = true)
+    @JsonProperty("username")
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
+    @JsonProperty("passwordHash")
     private String passwordHash;
+
     public UserEntity(UserDTO userDTO){
         super();
         this.username = userDTO.getUsername();

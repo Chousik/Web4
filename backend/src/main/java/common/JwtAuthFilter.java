@@ -1,16 +1,10 @@
 package common;
 
 import auth.models.JwtTokenService;
-import jakarta.ejb.EJB;
-import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
-
-import java.io.IOException;
 
 @Provider
 public class JwtAuthFilter implements ContainerRequestFilter {
@@ -20,7 +14,7 @@ public class JwtAuthFilter implements ContainerRequestFilter {
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext){
 
         String path = requestContext.getUriInfo().getPath();
         if (!path.contains("points")) {

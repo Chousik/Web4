@@ -1,4 +1,4 @@
-package filters;
+package common;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
@@ -13,7 +13,7 @@ public class CORSFilter implements ContainerResponseFilter {
                        ContainerResponseContext responseContext) {
         responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:3000");
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
-        responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-        responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
+        responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept");
     }
 }

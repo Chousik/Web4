@@ -32,9 +32,9 @@ public class PointsService {
     }
     public String checkPoint(String username, PointRequestDTO pointRequestDTO) throws IllegalArgumentException{
         long startTime = System.nanoTime();
-//        if (!checkService.check(pointRequestDTO)){
-//            throw new IllegalArgumentException("Запрос содержит неверные аргументы");
-//        }
+        if (!checkService.valid(pointRequestDTO)){
+            throw new IllegalArgumentException("Запрос содержит неверные аргументы");
+        }
         PointResponseDTO pointResponseDTO = new PointResponseDTO(pointRequestDTO);
         pointResponseDTO.setHit(checkService.check(pointRequestDTO));
         String dateNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

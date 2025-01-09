@@ -1,0 +1,6 @@
+cluster.name: "cluster-for-Raila-Martin"
+network.host: 0.0.0.0
+xpack.sql.enabled: true
+xpack.security.enabled: true
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: false
